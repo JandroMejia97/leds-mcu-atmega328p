@@ -1,9 +1,5 @@
 # **Trabajo Práctico 1:** Control de periféricos externos con puertos E/S.
 
-
-Hernández Mejía, Carlos Alejandro \
-11 de abril del 2022
-
 ## Introducción
 
 ## Objetivos
@@ -41,3 +37,6 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
 
 ## Conclusiones
+
+## Author
+- [@JandroMejia97](https://www.github.com/JandroMejia97)
