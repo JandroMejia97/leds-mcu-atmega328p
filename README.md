@@ -37,7 +37,56 @@ Mientras que en el punto 3, se pide implementar un algoritmo que permita encende
 Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir dicho patrón, comenzando por encender y apagar las LEDs del medio hasta llegar a los extremos (b3 y b4 – b2 y b5 – b1 y b6 – b0 y b7). Volviendo al patrón original si el usuario presiona nuevamente el pulsador y viceversa. 
 
 ## Resolución
-1. Lo primero que se deberá hacer es armar el esquema eléctrico de cómo se conectará cada uno de los LEDs a nuestro MCU. Para ello, se decidió conectar cada LED a cada uno de los pines correspondientes a PB. 
+1. Lo primero que se deberá hacer es armar el esquema eléctrico de cómo se conectará cada uno de los LEDs al puerto B de nuestro MCU. Para ello, se decidió conectar 2 LEDs azules a los pines PB0 y PB7 (a los extremos), 2 LEDs verdes a los pines PB1 y PB2, LEDs amarillos en PB2 y PB5 y por último, 2 LEDs rojos en PB3 y PB4. Todos estos conectados con cátodo común a tierra, para que dichos LEDs se enciendan con voltaje positivo. Esto se puede observar con mayor detalle en la siguiente imagen.
 
+    ![alt_text](images/image1.png "image_tooltip")
+    \
+    **Figura 1:** Esquema eléctrico de conexión de los LEDs con cátodo común.
+
+    Con el esquema establecido, es necesario determinar el valor de las resistencias a utilizar, para ello, se hará uso de la Ley de Ohm, que establece que “La diferencia de potencial (tensión) U entre los terminales de un elemento de resistencia pura es **directamente proporcional a la intensidad de la corriente** i que circula a través de esta”.
+  
+    // Equation here
+
+    Donde R es la resistencia eléctrica del elemento.
+
+    Por lo tanto, dado que se conoce tensión suminastrada por cada pin (5V) y la tensión que requiere cada color de LED (rojo=1.8V, verde=2.2V, amarillo=2.0V azul=3.0V) y se conoce la corriente que circulará por dicho elemento, se puede resolver para R la ecuación anterior. 
+
+    Por lo tanto, aplicando la ecuación anterior a los datos disponibles se obtiene que el valor de las resistencias a colocar a cada uno de los LEDs rojos, verdes, amarillos y azules tendrían que ser de 320 Ω, 280 Ω, 300Ω y 200Ω respectivamente.
+
+2. Para continuar, deberá incorporarse un pulsador al esquema planteado anteriormente, el cual se conectará en un extremo como entrada al PINC0 y el otro se conectará a GND.
+
+    Además, para evitar la lectura de valores erróneos debido a factores externos en el estado de reposo del pulsador se habilitará el pull-up interno del MCU (vea el punto 3 para más detalles).
+
+    ![alt_text](images/image2.png "image_tooltip")
+    \
+    **Figura 2:** Esquema eléctrico de conexión de los LEDs y pulsador.
+
+    Ahora, la pregunta es, ¿qué es el efecto rebote? Se le llama así al efecto que se produce cuando se presiona un pulsador mecánico, dónde 2 conductores metálicos se unen. Para el usuario, el contacto se produce de manera inmediata, pero esto no es del todo cierto, debido a que dentro del pulsador hay partes móviles. Cuando se presiona el interruptor, las partes metálicas “rebotan” entre “contacto” y “no en contacto”. Es decir, “cuando el interruptor se cierra, los 2 contactos en realidad se separan y se vuelven a conectar, por lo general, de 10 a 100 veces durante aproximadamente 1ms” (Horowitz & Hill, 2a edición, pág. 506).
+
+    Por lo general, el procesamiento del MCU es más rápido que el rebote, por lo que este interpreta dicho efecto cómo si el interruptor se ha presionado varias veces.
+
+    ![alt_text](images/image3.png "image_tooltip")
+     \
+    **Figura 3:** Rebote de interruptor típico, sin mitigación.
+
+    Este efecto puede ser mitigado mediante el uso de hardware y software.
+
+    En el caso de la mitigación mediante hardware, es necesario convertir nuestro circuito en uno R-C, agregando un capacitor cerámico a este. 
+
+    ![alt_text](images/image4.png "image_tooltip")
+     \
+    **Figura 4:** Circuito R-C para mitigar el efecto de rebote mediante hardware.
+
+    En el capacitor se almacenarán cargas, lo que nos permitirá, de cierta manera “suavizar” (o filtrar) los saltos producidos por el efecto rebote.
+
+    ![alt_text](images/image5.png "image_tooltip")
+     \
+    **Figura 5:** Mitigación del efecto rebote mediante hardware.
+
+    La mitigación de este efecto mediante hardware tiene como desventaja que implica aumentar un poco la complejidad del circuito al agregar un componente más y lo que a su vez implica un aumento de los costos. Es por ello que se tiene la mitigación mediante software.
+
+    La forma más fácil, sería agregando un tiempo de espera de Xms luego de recibido el primer rebote, así se ignoran las lecturas siguientes producidas por dicho efecto. La desventaja de esta solución es que se obliga al MCU a permanecer pausado mientras finaliza el período de espera.
+
+    La solución más eficiente para manejar dicho problema sería haciendo uso de interrupciones para manejar el rebote del interruptor, siempre y cuando se tenga en cuenta que dicha interrupción se puede disparar tanto en el flanco de subida, como en el de bajada, lo cuál puede provocar que el MCU apile interrupciones en espera.
 
 ## Conclusiones
