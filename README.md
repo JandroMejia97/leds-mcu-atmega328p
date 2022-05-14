@@ -5,6 +5,17 @@ Hernández Mejía, Carlos Alejandro \
 11 de abril del 2022
 
 ## Introducción
+En el presente documento se muestran de manera detallada los pasos seguidos para resolver un problema que haga uso del MCU y su integración con periféricos externos mediante la conexión de estos en algunos de sus puertos.
+
+En la primera sección se definen los objetivos que se esperan que asimilar luego de finalizar este trabajo práctico.
+
+Luego se define el problema que se tuvo que resolver. En esta sección se plantean distintas problemáticas para que con el fin de poder reflexionar y plantear la mejor solución posible.
+
+Seguido de esto, se deja una sección completa donde se explica de manera detallada la interpretación del problema planteado anteriormente.
+
+Además, se explica de manera detallada y coherente el raciocinio que ha seguido para resolver cada uno de los incisos planteados.
+
+También, se adjunta documentación que valida que la solución planteada realmente resuelve el problema y cumple con los requisitos solicitados. Para terminar, se anexa el código de la solución.
 
 ## Objetivos
 
@@ -39,13 +50,13 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 ## Resolución
 1. Lo primero que se deberá hacer es armar el esquema eléctrico de cómo se conectará cada uno de los LEDs al puerto B de nuestro MCU. Para ello, se decidió conectar 2 LEDs azules a los pines PB0 y PB7 (a los extremos), 2 LEDs verdes a los pines PB1 y PB2, LEDs amarillos en PB2 y PB5 y por último, 2 LEDs rojos en PB3 y PB4. Todos estos conectados con cátodo común a tierra, para que dichos LEDs se enciendan con voltaje positivo. Esto se puede observar con mayor detalle en la siguiente imagen.
 
-    ![alt_text](images/image1.png "image_tooltip")
+    ![Esquema eléctrico de conexión de los LEDs con cátodo común](images/image1.png "image_tooltip")
     \
     **Figura 1:** Esquema eléctrico de conexión de los LEDs con cátodo común.
 
     Con el esquema establecido, es necesario determinar el valor de las resistencias a utilizar, para ello, se hará uso de la Ley de Ohm, que establece que “La diferencia de potencial (tensión) U entre los terminales de un elemento de resistencia pura es **directamente proporcional a la intensidad de la corriente** i que circula a través de esta”.
   
-    // Equation here
+    ![equation](http://latex.codecogs.com/gif.latex?u=iR)
 
     Donde R es la resistencia eléctrica del elemento.
 
@@ -57,7 +68,7 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     Además, para evitar la lectura de valores erróneos debido a factores externos en el estado de reposo del pulsador se habilitará el pull-up interno del MCU (vea el punto 3 para más detalles).
 
-    ![alt_text](images/image2.png "image_tooltip")
+    ![Esquema eléctrico de conexión de los LEDs y pulsador](images/image2.png "image_tooltip")
     \
     **Figura 2:** Esquema eléctrico de conexión de los LEDs y pulsador.
 
