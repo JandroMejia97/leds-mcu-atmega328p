@@ -51,12 +51,15 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
     **Figura 1:** Esquema eléctrico de conexión de los LEDs con cátodo común.
 
     Con el esquema establecido, es necesario determinar el valor de las resistencias a utilizar, para ello, se hará uso de la Ley de Ohm, que establece que “La diferencia de potencial (tensión) U entre los terminales de un elemento de resistencia pura es **directamente proporcional a la intensidad de la corriente** i que circula a través de esta”.
-  
+
     ![equation](http://latex.codecogs.com/gif.latex?u=iR)
 
     Donde R es la resistencia eléctrica del elemento.
 
-    Por lo tanto, dado que se conoce tensión suminastrada por cada pin (5V) y la tensión que requiere cada color de LED (rojo=1.8V, verde=2.2V, amarillo=2.0V azul=3.0V) y se conoce la corriente que circulará por dicho elemento, se puede resolver para R la ecuación anterior. 
+
+    Por lo tanto, dado que se conoce tensión suminastrada por cada pin (5V) y la tensión que requiere cada color de LED (rojo=1.8V, verde=2.2V, amarillo=2.0V azul=3.0V) y se conoce la corriente que circulará por dicho elemento, se puede resolver para R la ecuación anterior.
+
+    ![equation](http://latex.codecogs.com/gif.latex?R=u/i)
 
     Por lo tanto, aplicando la ecuación anterior a los datos disponibles se obtiene que el valor de las resistencias a colocar a cada uno de los LEDs rojos, verdes, amarillos y azules tendrían que ser de 320 Ω, 280 Ω, 300Ω y 200Ω respectivamente.
 
@@ -72,7 +75,7 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     Por lo general, el procesamiento del MCU es más rápido que el rebote, por lo que este interpreta dicho efecto cómo si el interruptor se ha presionado varias veces.
 
-    ![alt_text](images/image3.png "image_tooltip")
+    ![Rebote de interruptor típico, sin mitigación.](images/image3.png "image_tooltip")
      \
     **Figura 3:** Rebote de interruptor típico, sin mitigación.
 
@@ -80,14 +83,14 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     En el caso de la mitigación mediante hardware, es necesario convertir nuestro circuito en uno R-C, agregando un capacitor cerámico a este. 
 
-    ![alt_text](images/image4.png "image_tooltip")
-     \
+    ![Circuito R-C para mitigar el efecto de rebote mediante hardware.](images/image4.png "image_tooltip")
+    \
     **Figura 4:** Circuito R-C para mitigar el efecto de rebote mediante hardware.
 
     En el capacitor se almacenarán cargas, lo que nos permitirá, de cierta manera “suavizar” (o filtrar) los saltos producidos por el efecto rebote.
 
-    ![alt_text](images/image5.png "image_tooltip")
-     \
+    ![Mitigación del rebote mediante hardware.](images/image5.png "image_tooltip")
+    \
     **Figura 5:** Mitigación del efecto rebote mediante hardware.
 
     La mitigación de este efecto mediante hardware tiene como desventaja que implica aumentar un poco la complejidad del circuito al agregar un componente más y lo que a su vez implica un aumento de los costos. Es por ello que se tiene la mitigación mediante software.
@@ -96,7 +99,76 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     La solución más eficiente para manejar dicho problema sería haciendo uso de interrupciones para manejar el rebote del interruptor, siempre y cuando se tenga en cuenta que dicha interrupción se puede disparar tanto en el flanco de subida, como en el de bajada, lo cuál puede provocar que el MCU apile interrupciones en espera.
 
-## Conclusiones
+    Para nuestro caso en particular, haremos uso del retardo, debido a qué por ahora no se tienen los conocimientos necesarios para implementar un vector de interrupciones en C.
+
+
+
+3. Para resolver este problema, se deberán seguir los siguientes pasos
+    1. **Configurar los puertos a usar:**
+        1. Establecer todos los pines del puerto B cómo salida, lo cuál se logra poniendo unos en **DDRB**.
+        2. Establecer el **PINC0 **cómo entrada, lo cuál se logra poniendo un cero en **DDRC0**, para este caso, se optó por establecer todo el puerto C como entrada (poner ceros en **DDRC**).
+        3. Habilitar el pull-up del pin **PINC0**, esto se logra poniendo un uno en dicho registro.
+    2. **Definir las secuencias:**
+        4. Para mostrar la secuencia inicial  (b0 y b7 – b1 y b6 – b2 y b5 – b3 y b4) es necesario considerar que encender **b0 y b7** implica asignarle el valor **0x81 **en **PORTB**, mientras que para **b1 y b6, b2 y b5, b3 y b4**, se tendrían que asignar en dicho puerto los valores** 0x42, 0x24 y 0x18** respectivamente.
+        5. Es necesario que cada uno de estos valores se mantengan en memoria, es por ello que se creará un vector con los valores mencionados anteriormente.
+        6. Para asignar cada uno de los valores en **PORTB** será necesario ir recorriendo el vector que contiene la secuencia desde la posición cero, hasta la posición final.
+        7. Dado que los valores asignados en **PORTB** para mostrar la secuencia **b3 y b4, b2 y b5, b1 y b6, b0 y b7** son los mismos de la secuencia inicial, pero con el orden invertido, se hará uso del mismo vector del punto anterior, pero se recorrerá desde el último elemento hasta el primero. 
+        8. Para mostrar la secuencia se requerirá conocer el sentido de la secuencia y la posición del valor a mostrar en nuestro vector con la secuencia inicial.
+    3. **Verificar si el estado del PINC0 es igual a cero:**
+        9. Si es así (se seleccionó pull-up), se hace una espera de 10ms mientras se estabiliza el valor de la entrada por el efecto de rebote.
+        10. Se deberá retener el flujo mientras el valor del **PINC0** sea cero, ya que esto implica que el pulsador se mantiene presionado.
+        11. Luego que se ha liberado el pulsador, se hace nuevamente una espera de 10ms.
+        12. Se cambia el flag que indica el sentido de la secuencia y se restablece la posición a mostrar.
+    4. **Caso contrario:**
+        13. Se incrementa la posición a mostrar del vector de secuencias
+        14. Para no sobrepasar los límites del arreglo se tendrá que obtener el resto de dividir la posición entre la longitud del arreglo.
+4. Cómo se mencionó anteriormente, la ventaja de usar el retardo bloqueante (o tiempo de espera) es que no se requiere de hardware para mitigar el efecto de rebote, pero dicho método tiene como desventaja que obliga al MCU a permanecer pausado mientras finaliza el período de espera, quedando la CPU inutilizada y desperdiciando tiempo en el que se podrían realizar otras operaciones.
+
+    En el caso de mantener presionado el pulsador, esto se mitiga con lo mencionado en el punto 3.c.
+
+## Validación
+
+La simulación arranca ejecutando inicialmente la secuencia  b0 y b7, b1 y b6, b2 y b5, b3 y b4. A continuación se muestran capturas de pantallas del funcionamiento.
+
+![Secuencia inicial](images/image6.png "image_tooltip")
+ \
+**Figura 6:** Secuencia inicial, LEDs b0 y b7 activos.
+
+![Secuencia inicial](images/image7.png "image_tooltip")
+ \
+**Figura 7:** Secuencia inicial, LEDs b1 y b6 activos.
+
+![Secuencia inicial](images/image8.png "image_tooltip")
+ \
+**Figura 8:** Secuencia inicial, LEDs b2 y b5 activos.
+
+![Secuencia inicial](images/image9.png "image_tooltip")
+ \
+**Figura 9:** Secuencia inicial, LEDs b3 y b4 activos.
+
+Al presionar el pulsador la secuencia mostrada se invierte, a continuación capturas de pantalla:
+
+![Secuencia inicial](images/image10.png "image_tooltip")
+ \
+**Figura 10:** Secuencia inicial, LEDs b3 y b4 activos.
+
+![Secuencia inicial](images/image11.png "image_tooltip")
+ \
+**Figura 11:** Secuencia inicial, LEDs b2 y b5 activos.
+
+![Secuencia inicial](images/image12.png "image_tooltip")
+ \
+**Figura 12:** Secuencia inicial, LEDs b1 y b6 activos.
+
+![Secuencia inicial](images/image13.png "image_tooltip")
+ \
+**Figura 13:** Secuencia inicial, LEDs b0 y b7 activos.
+
+## Bibliografía
+
+* Display de 7 segmentos ánodo y cátodo común. Disponible en: [Display 7 Segmentos ánodo y cátodo común - HETPRO/TUTORIALES (hetpro-store.com)](https://hetpro-store.com/TUTORIALES/display-7-segmentos-anodo-catodo-comun/)
+* Resistencia de LED, Cómo calcularla en función a la corriente. Disponible en: [Resistencia de LED, Como calcularla en función a la corriente - HeTPro (hetpro-store.com)](https://hetpro-store.com/TUTORIALES/resistencia-de-led/)
+* Resistencia pull-up y pull-down. Disponible en: [Resistencia pull up y pull down con Arduino, para qué sirven (programarfacil.com)](https://programarfacil.com/blog/arduino-blog/resistencia-pull-up-y-pull-down/)Switch Bounce and How to Deal with it. Disponible en: [Switch Bounce and How to Deal with It - Technical Articles (allaboutcircuits.com)](https://www.allaboutcircuits.com/technical-articles/switch-bounce-how-to-deal-with-it/)
 
 ## Author
 - [@JandroMejia97](https://www.github.com/JandroMejia97)
