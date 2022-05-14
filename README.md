@@ -46,7 +46,7 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 ## Resolución
 1. Lo primero que se deberá hacer es armar el esquema eléctrico de cómo se conectará cada uno de los LEDs al puerto B de nuestro MCU. Para ello, se decidió conectar 2 LEDs azules a los pines PB0 y PB7 (a los extremos), 2 LEDs verdes a los pines PB1 y PB2, LEDs amarillos en PB2 y PB5 y por último, 2 LEDs rojos en PB3 y PB4. Todos estos conectados con cátodo común a tierra, para que dichos LEDs se enciendan con voltaje positivo. Esto se puede observar con mayor detalle en la siguiente imagen.
 
-    ![Esquema eléctrico de conexión de los LEDs con cátodo común](images/image1.png "image_tooltip")
+    ![Esquema eléctrico de conexión de los LEDs con cátodo común](https://drive.google.com/uc?id=1Ph4TPi9YqpqtM0wc0RvTMYnveNQPNMmc)
     \
     **Figura 1:** Esquema eléctrico de conexión de los LEDs con cátodo común.
 
@@ -67,7 +67,7 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     Además, para evitar la lectura de valores erróneos debido a factores externos en el estado de reposo del pulsador se habilitará el pull-up interno del MCU (vea el punto 3 para más detalles).
 
-    ![Esquema eléctrico de conexión de los LEDs y pulsador](images/image2.png "image_tooltip")
+    ![Esquema eléctrico de conexión de los LEDs y pulsador](https://drive.google.com/uc?id=1fzm9AWcW6gioLq-dgDV1dPlo3xC2TnpX)
     \
     **Figura 2:** Esquema eléctrico de conexión de los LEDs y pulsador.
 
@@ -75,7 +75,7 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     Por lo general, el procesamiento del MCU es más rápido que el rebote, por lo que este interpreta dicho efecto cómo si el interruptor se ha presionado varias veces.
 
-    ![Rebote de interruptor típico, sin mitigación.](images/image3.png "image_tooltip")
+    ![Rebote de interruptor típico, sin mitigación.](https://drive.google.com/uc?id=1QvZ5QJXsUMuJdpHrVd8LKUCCVfwGb0FB)
      \
     **Figura 3:** Rebote de interruptor típico, sin mitigación.
 
@@ -83,13 +83,13 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
     En el caso de la mitigación mediante hardware, es necesario convertir nuestro circuito en uno R-C, agregando un capacitor cerámico a este. 
 
-    ![Circuito R-C para mitigar el efecto de rebote mediante hardware.](images/image4.png "image_tooltip")
+    ![Circuito R-C para mitigar el efecto de rebote mediante hardware.](https://drive.google.com/uc?id=1fNn__CYsecopoJKTr0kFwVYveCfGhfhA)
     \
     **Figura 4:** Circuito R-C para mitigar el efecto de rebote mediante hardware.
 
     En el capacitor se almacenarán cargas, lo que nos permitirá, de cierta manera “suavizar” (o filtrar) los saltos producidos por el efecto rebote.
 
-    ![Mitigación del rebote mediante hardware.](images/image5.png "image_tooltip")
+    ![Mitigación del rebote mediante hardware.](https://drive.google.com/uc?id=14qj-VRDvcmfcEFvwmyV09q6ByP1uuHqu)
     \
     **Figura 5:** Mitigación del efecto rebote mediante hardware.
 
@@ -130,37 +130,37 @@ Luego, si se llegase a presionar (y soltar) el pulsador, se tendrá que invertir
 
 La simulación arranca ejecutando inicialmente la secuencia  b0 y b7, b1 y b6, b2 y b5, b3 y b4. A continuación se muestran capturas de pantallas del funcionamiento.
 
-![Secuencia inicial](images/image6.png "image_tooltip")
+![Secuencia inicial, LEDs b0 y b7 activos.](https://drive.google.com/uc?id=1K7F0onQyKPhy8aFoeSe9VWtEGJGQw3og)
  \
 **Figura 6:** Secuencia inicial, LEDs b0 y b7 activos.
 
-![Secuencia inicial](images/image7.png "image_tooltip")
+![Secuencia inicial, LEDs b1 y b6 activos.](https://drive.google.com/uc?id=1zs8LfeJDp0R3z_jUdnh4bMD5xzyEONTS)
  \
 **Figura 7:** Secuencia inicial, LEDs b1 y b6 activos.
 
-![Secuencia inicial](images/image8.png "image_tooltip")
+![Secuencia inicial, LEDs b2 y b5 activos.](https://drive.google.com/uc?id=1jfg6uYZ-cd4cVyOhcEPvD0XXC0J0jsET)
  \
 **Figura 8:** Secuencia inicial, LEDs b2 y b5 activos.
 
-![Secuencia inicial](images/image9.png "image_tooltip")
+![Secuencia inicial, LEDs b3 y b4 activos.](https://drive.google.com/uc?id=1UrjyQpdziYhZ03KhTMpCGkCB_euOc8Dd)
  \
 **Figura 9:** Secuencia inicial, LEDs b3 y b4 activos.
 
 Al presionar el pulsador la secuencia mostrada se invierte, a continuación capturas de pantalla:
 
-![Secuencia inicial](images/image10.png "image_tooltip")
+![Secuencia inicial, LEDs b3 y b4 activos.](https://drive.google.com/uc?id=1pbiHx-Dpq_SQX66HUdFQr2I_OgCCdLwk)
  \
 **Figura 10:** Secuencia inicial, LEDs b3 y b4 activos.
 
-![Secuencia inicial](images/image11.png "image_tooltip")
+![Secuencia inicial, LEDs b2 y b5 activos.](https://drive.google.com/uc?id=1jgF119y2QdxTDR8fD1r4jTAKdkEW6YJd)
  \
 **Figura 11:** Secuencia inicial, LEDs b2 y b5 activos.
 
-![Secuencia inicial](images/image12.png "image_tooltip")
+![Secuencia inicial, LEDs b1 y b6 activos.](https://drive.google.com/uc?id=1PMGnf8jZ3LuZ3LcEiv-9iW1AwZ98W-h_)
  \
 **Figura 12:** Secuencia inicial, LEDs b1 y b6 activos.
 
-![Secuencia inicial](images/image13.png "image_tooltip")
+![Secuencia inicial, LEDs b0 y b7 activos.](https://drive.google.com/uc?id=1Z1QP2G7AzGllnCYl_dHdk5poAQbfCXE4)
  \
 **Figura 13:** Secuencia inicial, LEDs b0 y b7 activos.
 
